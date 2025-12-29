@@ -119,7 +119,7 @@ function Home() {
             <div className="relative z-10 w-full max-w-xs">
               <div className={`rounded-lg overflow-hidden shadow-sm transform rotate-0 hover:rotate-0 transition-transform duration-300
                 ${darkMode ? "border-gray-700" : "border-white"}`}>
-                <img src="https://files.catbox.moe/84z7al.png" alt="Resume Preview" className="w-full h-auto object-cover"
+                <img src="https://njvawavweamzvvakmsgn.supabase.co/storage/v1/object/public/accioresume/hello.jpg" alt="Resume Preview" className="w-full h-auto object-cover"
                   onError={(e) => { e.target.src = templates[0].src; }} />
               </div>
 
