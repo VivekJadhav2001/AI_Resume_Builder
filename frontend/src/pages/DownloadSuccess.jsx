@@ -22,9 +22,9 @@ export default function DownloadSuccess() {
 
                     <div className="mt-8 flex flex-col gap-3">
 
-                        <button className="cursor-pointer flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl text-lg font-semibold hover:bg-gray-50 transition" onClick={()=>navigate("/preview")}>
+                        {/* <button className="cursor-pointer flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl text-lg font-semibold hover:bg-gray-50 transition" onClick={()=>navigate("/preview")}>
                             <FaArrowLeft size={20}  /> Go Back & Download Again
-                        </button>
+                        </button> */}
 
                         <button className="cursor-pointer flex items-center justify-center gap-2 bg-black hover:bg-gray-800 text-white py-3 rounded-xl text-lg font-semibold transition" onClick={() => navigate("/")}>
                             <FaHome size={20} /> Go to Homepage

@@ -388,7 +388,7 @@ const templates = [
     id: TEMPLATES_ID.TEMPLATE_1,
     src: "https://njvawavweamzvvakmsgn.supabase.co/storage/v1/object/public/accioresume/resume.png",
   },
-  { id: TEMPLATES_ID.TEMPLATE_2, src: "https://njvawavweamzvvakmsgn.supabase.co/storage/v1/object/public/accioresume/templateShumit.png" },
+  // { id: TEMPLATES_ID.TEMPLATE_2, src: "https://njvawavweamzvvakmsgn.supabase.co/storage/v1/object/public/accioresume/templateShumit.png" },
 ];
 
 const SECTION_TITLES = {
