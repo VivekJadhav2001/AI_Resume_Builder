@@ -12,7 +12,7 @@ const MultiSelect = ({
   const skillType = subsectionKey || item.id;
   const options = skillsOptions[skillType] || [];
 
-  console.log(subsectionKey,'sub section key in multiselect')
+  // console.log(subsectionKey,'sub section key in multiselect')
 
   const parseValue = () => {
     if (!item.answer) return [];

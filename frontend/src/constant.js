@@ -623,7 +623,7 @@ const customStyles = {
 
 // Validate form to fill all required fields
 function isRequiredFieldsFilled(section) {
-    console.log(section,'section')
+    // console.log(section,'section')
   if (!section) return false;
 
   // Some answers (especially from text editor) may

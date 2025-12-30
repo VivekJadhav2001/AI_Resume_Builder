@@ -22,8 +22,8 @@ const formDataSlice = createSlice({
             const answer = action.payload.answer
             const subSectionKey = action.payload?.subSectionKey
             // state = action.payload
-            console.log(subSectionKey,'sub section keyu')
-            console.log(action.payload,'action payload')
+            // console.log(subSectionKey,'sub section keyu')
+            // console.log(action.payload,'action payload')
             if (subSectionKey) {
                 state[section][subSectionKey].forEach((item) => {
                     if (item.id === questionId) {
@@ -34,9 +34,9 @@ const formDataSlice = createSlice({
                 state.renderingQuestions = state[section]
             } else {
 
-                console.log(state,section,'error debug')
+                // console.log(state,section,'error debug')
                 state[section].forEach((item) => {
-                    console.log(item,'in updating input')
+                    // console.log(item,'in updating input')
                     if (item.id === questionId) {
                         item.answer = answer
                     }

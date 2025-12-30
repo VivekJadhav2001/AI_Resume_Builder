@@ -17,7 +17,7 @@ const ProtectedRoute = ({ route, children }) => {
         return <Navigate to={ROUTES_PATH.HOME} replace />;
     }
 
-    console.log(route === ROUTES_PATH.PREVIEW && !isAllFormsFilled,route,!isAllFormsFilled)
+    // console.log(route === ROUTES_PATH.PREVIEW && !isAllFormsFilled,route,!isAllFormsFilled)
     //  Block preview if any form is NOT submitted
     if (route === ROUTES_PATH.PREVIEW && isAllFormsFilled) {
         return <Navigate to={ROUTES_PATH.FORM_SECTIONS} replace />;

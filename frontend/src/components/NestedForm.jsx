@@ -39,7 +39,7 @@ const NestedForm = ({ nestedData, section, labelFormatter, inputChange }) => {
   }
 
 
-  console.log( 'tabs data')
+  // console.log( 'tabs data')
   // Reset tabs on section change
   useEffect(() => {
     setActiveTab(tabs[0] || null);

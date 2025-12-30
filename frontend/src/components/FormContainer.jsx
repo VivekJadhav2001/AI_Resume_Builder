@@ -54,7 +54,7 @@ function FormContainer({ setSubmittedFormCount, submittedFormCount }) {
 
     // Update answer for each question in store
     function inputChange(text, item, subSectionKey = null) {
-        console.log(subSectionKey, item, text, 'input chage params')
+        // console.log(subSectionKey, item, text, 'input chage params')
         // UPDATE FIELD VALUE , VALIDATE
         const updatedItem = { ...item, answer: text };
 
@@ -67,7 +67,7 @@ function FormContainer({ setSubmittedFormCount, submittedFormCount }) {
             if (!result.valid) {
                 // If field has error → store message
                 copy[item.id] = result.message;
-                console.log("Item ID:", item.id);
+                // console.log("Item ID:", item.id);
             } else {
                 // If field is correct  remove error
                 delete copy[item.id];

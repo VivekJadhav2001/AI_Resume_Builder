@@ -9,7 +9,7 @@ import useResumeSection from '../utils/resume_template1_sections/allSections.jsx
 function PreviewWraper() {
     const data = useSelector((state) => state.formdata)
     const [userData, setUserData] = useState(data)
-    console.log(data, 'data from store in wrapper check')
+    // console.log(data, 'data from store in wrapper check')
 
     const dispatch = useDispatch()
 
