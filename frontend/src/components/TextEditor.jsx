@@ -60,20 +60,7 @@ const TextEditor = ({ item, section, inputChange, subsectionKey }) => {
       console.log(rawText)
 
       // // Replaces users text to optimised text from AI
-      // let aiSuggestionResult = "";
-
-      // try {
-      //   // enhanceText now throws on error and returns string on success
-      //   aiSuggestionResult = await enhanceText(rawText, item.maxLength, item.minLength);
-
-      // } catch (err) {
-      //   // show a friendly message and also log the underlying error
-      //   console.error("AI call failed:", err.message || err);
-      //   return;
-      // }
-      // // setContent is synchronous-ish but returns nothing — still await in case plugin returns a promise
-      // await editorRef.current.setContent(aiSuggestionResult);
-
+      
       const aiSuggestionResult = await enhanceText(
         rawText,
         item.maxLength,

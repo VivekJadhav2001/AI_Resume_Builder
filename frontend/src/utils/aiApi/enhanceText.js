@@ -1,4 +1,4 @@
-import api from "../api/axios.js"; // ✅ USE YOUR INSTANCE
+import api from "../api/axios.js"; //USE YOUR INSTANCE
 
 export async function enhanceText(inputText, maxLength = 800, minLength = 300) {
   try {
@@ -8,9 +8,9 @@ export async function enhanceText(inputText, maxLength = 800, minLength = 300) {
       minLength,
     });
 
-    return res.data.text; // ✅ ALWAYS string
+    return res.data.text; // ALWAYS string
   } catch (err) {
     console.error("AI error:", err);
-    return ""; // ✅ NEVER return object
+    return ""; // NEVER return object
   }
 }

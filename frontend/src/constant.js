@@ -605,7 +605,7 @@ const customStyles = {
     color: "#9ca3af",
   }),
 
-  // 🔥 REQUIRED FOR DROPDOWN TO SHOW PROPERLY
+  // REQUIRED FOR DROPDOWN TO SHOW PROPERLY
   menu: (provided) => ({
     ...provided,
     zIndex: 9999,
