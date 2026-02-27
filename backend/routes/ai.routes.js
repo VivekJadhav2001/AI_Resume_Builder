@@ -53,7 +53,7 @@ Text: "${inputText.trim()}"
 
     res.json({ text: finalText });
   } catch (err) {
-    console.error(err);
+    // console.error(err);
     res.status(500).json({ error: "AI enhancement failed" });
   }
 });

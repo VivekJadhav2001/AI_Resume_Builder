@@ -25,7 +25,7 @@ function Form() {
             const localStorageData = JSON.parse(locallyStoredUserData);
             dispatch(updateStoreData(localStorageData));
             } catch (error) {
-              console.error("Corrupted localStorage userData:", error);
+            //   console.error("Corrupted localStorage userData:", error);
               localStorage.removeItem("userData");
             }
         }

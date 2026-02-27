@@ -57,7 +57,7 @@ const TextEditor = ({ item, section, inputChange, subsectionKey }) => {
       }
 
       const rawText = editorRef.current.getContent({ format: "text" }) || "";
-      console.log(rawText)
+      // console.log(rawText)
 
       // // Replaces users text to optimised text from AI
       

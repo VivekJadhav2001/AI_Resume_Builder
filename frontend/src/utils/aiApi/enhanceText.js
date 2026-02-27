@@ -10,7 +10,7 @@ export async function enhanceText(inputText, maxLength = 800, minLength = 300) {
 
     return res.data.text; // ALWAYS string
   } catch (err) {
-    console.error("AI error:", err);
+    // console.error("AI error:", err);
     return ""; // NEVER return object
   }
 }
