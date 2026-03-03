@@ -3,7 +3,7 @@ import axios from "axios";
 
 const router = express.Router();
 
-router.get("/enhance-text", async (req, res) => {
+router.post("/enhance-text", async (req, res) => {
   try {
     // const inputText = "I am a frontend dev, fresher";
     // const minLength = 100;
