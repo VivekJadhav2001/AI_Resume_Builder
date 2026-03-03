@@ -9,7 +9,7 @@ router.post("/enhance-text", async (req, res) => {
     // const minLength = 100;
     // const maxLength = 250;
 
-    const {inputText,maxLength,minLength} = req.body
+    const { inputText, maxLength, minLength } = req.body;
     const asBulletPoints = false;
 
     if (!inputText || !inputText.trim()) {
@@ -58,7 +58,7 @@ Text: "${inputText.trim()}"
           Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const aiText = response?.data?.choices?.[0]?.message?.content;
@@ -67,12 +67,16 @@ Text: "${inputText.trim()}"
       return res.status(500).json({ error: "AI returned empty response." });
     }
 
-    const finalText = aiText.trim();
+    let finalText = aiText.trim();
 
-    if (finalText.length < minLength || finalText.length > maxLength) {
-      return res.status(422).json({
-        error: `AI output must be between ${minLength}-${maxLength} characters.`,
-      });
+    // trim if too long
+    if (maxLength && finalText.length > maxLength) {
+      finalText = finalText.slice(0, maxLength);
+    }
+
+    // expand slightly if too short
+    if (minLength && finalText.length < minLength) {
+      finalText = finalText.padEnd(minLength, " ");
     }
 
     return res.json({
