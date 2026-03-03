@@ -9,7 +9,7 @@ router.post("/enhance-text", async (req, res) => {
     // const minLength = 100;
     // const maxLength = 250;
 
-    const {inputText,minLength,maxLength} = req.body
+    const {inputText,maxLength,minLength} = req.body
     const asBulletPoints = false;
 
     if (!inputText || !inputText.trim()) {
