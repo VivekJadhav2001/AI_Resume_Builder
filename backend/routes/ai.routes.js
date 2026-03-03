@@ -5,9 +5,11 @@ const router = express.Router();
 
 router.get("/enhance-text", async (req, res) => {
   try {
-    const inputText = "I am a frontend dev, fresher";
-    const minLength = 100;
-    const maxLength = 250;
+    // const inputText = "I am a frontend dev, fresher";
+    // const minLength = 100;
+    // const maxLength = 250;
+
+    const {inputText,minLength,maxLength} = req.body
     const asBulletPoints = false;
 
     if (!inputText || !inputText.trim()) {
