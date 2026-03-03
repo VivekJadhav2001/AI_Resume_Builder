@@ -3,58 +3,87 @@ import axios from "axios";
 
 const router = express.Router();
 
-router.post("/enhance-text", async (req, res) => {
+router.get("/enhance-text", async (req, res) => {
   try {
-    const { inputText, maxLength = 800, minLength = 300 } = req.body;
+    const inputText = "I am a frontend dev, fresher";
+    const minLength = 100;
+    const maxLength = 250;
+    const asBulletPoints = false;
 
     if (!inputText || !inputText.trim()) {
-      return res.status(400).json({ error: "Input cannot be empty" });
+      return res.status(400).json({ error: "Input cannot be empty." });
     }
 
+    const bulletRules = asBulletPoints
+      ? `
+- Format the final output as clean professional bullet points.
+- Each bullet must be a single line, no numbering.
+- Keep bullets action-driven and resume-style.
+`
+      : "";
+
     const prompt = `
-Rewrite and enhance the following text so that the final output is 
-professional, concise, resume-ready, and strictly between 
+Rewrite and enhance the following text so that the final output is
+professional, concise, resume-ready, and strictly between
 ${minLength} and ${maxLength} characters.
 
 - If the text is too short, expand it meaningfully.
 - If the text is too long, summarize it intelligently.
-- Return ONLY the improved final text.
+- Return ONLY the improved text with no additional commentary.
+${bulletRules}
 
 Text: "${inputText.trim()}"
 `;
 
-    const payload = {
-      contents: [{ parts: [{ text: prompt }] }],
-      systemInstruction: {
-        parts: [{ text: "You are a professional resume writer." }],
+    const response = await axios.post(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: "You are a professional resume writer.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.4,
       },
-    };
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${process.env.GEMINI_API_KEY}`;
-
-    const response = await axios.post(apiUrl, payload, {
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const aiText =
-      response?.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const aiText = response?.data?.choices?.[0]?.message?.content;
 
     if (!aiText) {
-      return res.status(500).json({ error: "AI returned empty response" });
+      return res.status(500).json({ error: "AI returned empty response." });
     }
 
     const finalText = aiText.trim();
 
     if (finalText.length < minLength || finalText.length > maxLength) {
-      return res
-        .status(422)
-        .json({ error: "Text length constraint failed" });
+      return res.status(422).json({
+        error: `AI output must be between ${minLength}-${maxLength} characters.`,
+      });
     }
 
-    res.json({ text: finalText });
+    return res.json({
+      success: true,
+      text: finalText,
+      length: finalText.length,
+    });
   } catch (err) {
-    // console.error(err);
-    res.status(500).json({ error: "AI enhancement failed" });
+    console.error("EnhanceText Error:", err?.response?.data || err.message);
+
+    return res.status(500).json({
+      error: "AI enhancement failed. Please try again.",
+    });
   }
 });
 
