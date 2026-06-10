@@ -1,221 +1,153 @@
 import { useDispatch, useSelector } from "react-redux";
-import { updateData, updateFormRender, updateStoreData, updateBackRender, } from "../features/formDataSlice";
-import { FORM_SECTIONS, getLabel, SECTION_TITLES, isRequiredFieldsFilled, validateField, } from "../constant";
+import { updateData, updateFormRender, updateStoreData, updateBackRender } from "../features/formDataSlice";
+import { FORM_SECTIONS, getLabel, SECTION_TITLES, isRequiredFieldsFilled, validateField } from "../constant";
 import { useNavigate } from "react-router-dom";
 import RenderingBasicForm from "./RenderBasicForm";
 import NestedForm from "./NestedForm";
-import { useCallback, useEffect, useMemo, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
+import { FaArrowLeft, FaArrowRight, FaCheck } from "react-icons/fa";
 
 function FormContainer({ setSubmittedFormCount, submittedFormCount }) {
-    const currentForm = useSelector((state) => state.formData.currentForm);
-    const renderingArray = useSelector((state) => state.formData.renderingQuestions);
-    const darkMode = useSelector((state) => state.theme);
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const sectionTitle = SECTION_TITLES[currentForm];
-    const isFinalSection = [FORM_SECTIONS.CERTIFICATIONS].includes(currentForm);
-    const [errors, setErrors] = useState({});
-    const [isDisabled, setIsDisabled] = useState(true);
-    const [isNested, setIsNested] = useState(false)
+  const currentForm = useSelector((state) => state.formData.currentForm);
+  const renderingArray = useSelector((state) => state.formData.renderingQuestions);
+  const darkMode = useSelector((state) => state.theme);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const sectionTitle = SECTION_TITLES[currentForm];
+  const isFinalSection = [FORM_SECTIONS.CERTIFICATIONS].includes(currentForm);
+  const [errors, setErrors] = useState({});
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isNested, setIsNested] = useState(false);
 
-
-
-
-    // On submit of form
-    function getData(e) {
-        e.preventDefault();
-
-        // If already disabled stop multiple submits
-        if (isDisabled) return;
-
-        // Validate all fields filled
-        if (!isRequiredFieldsFilled(renderingArray)) {
-            return;
-        }
-        // Data update in store (MOVED BEFORE THE IF CHECK)
-        dispatch(updateFormRender());
-
-        // Check if current form is last form - USE isFinalSection instead!
-        if (isFinalSection) {
-            // Mark all forms as filled
-            localStorage.setItem("isAllFormsFilled", "true");
-            navigate("/preview");
-        }
-        // Update count of form submitted count in local storage
-        localStorage.setItem("submittedFormCount", submittedFormCount + 1);
-
-        // Increase form submit count
-        setSubmittedFormCount((prev) => prev + 1);
+  function getData(e) {
+    e.preventDefault();
+    if (isDisabled) return;
+    if (!isRequiredFieldsFilled(renderingArray)) return;
+    dispatch(updateFormRender());
+    if (isFinalSection) {
+      localStorage.setItem("isAllFormsFilled", "true");
+      navigate("/preview");
     }
+    localStorage.setItem("submittedFormCount", submittedFormCount + 1);
+    setSubmittedFormCount((prev) => prev + 1);
+  }
 
+  function inputChange(text, item, subSectionKey = null) {
+    const updatedItem = { ...item, answer: text };
+    const result = validateField(updatedItem);
+    setErrors((prev) => {
+      const copy = { ...prev };
+      if (!result.valid) copy[item.id] = result.message;
+      else delete copy[item.id];
+      return copy;
+    });
+    dispatch(updateData({
+      answer: text,
+      questionId: item.id,
+      section: currentForm,
+      subSectionKey: subSectionKey || null,
+    }));
+  }
 
+  function goBack() {
+    dispatch(updateBackRender());
+    setSubmittedFormCount((prev) => Math.max(prev - 1, 0));
+  }
 
-    // Update answer for each question in store
-    function inputChange(text, item, subSectionKey = null) {
-        // console.log(subSectionKey, item, text, 'input chage params')
-        // UPDATE FIELD VALUE , VALIDATE
-        const updatedItem = { ...item, answer: text };
+  const updateSubmitButtonStatus = useCallback(() => {
+    const filled = isRequiredFieldsFilled(renderingArray);
+    const hasErrors = Object.keys(errors).length > 0;
+    setIsDisabled(!filled || hasErrors);
+  }, [renderingArray, errors]);
 
-        // Run validation for this specific field
-        const result = validateField(updatedItem);
+  function isFormNested() {
+    if (!renderingArray || Array.isArray(renderingArray)) { setIsNested(false); return; }
+    if (typeof renderingArray === "object") {
+      const values = Object.values(renderingArray);
+      setIsNested(values.length > 0 && values.every((v) => Array.isArray(v)));
+    } else { setIsNested(false); }
+  }
 
-        setErrors((prev) => {
-            const copy = { ...prev };
+  useEffect(() => {
+    isFormNested();
+    updateSubmitButtonStatus();
+  }, [renderingArray]);
 
-            if (!result.valid) {
-                // If field has error → store message
-                copy[item.id] = result.message;
-                // console.log("Item ID:", item.id);
-            } else {
-                // If field is correct  remove error
-                delete copy[item.id];
-            }
+  const dm = darkMode;
 
+  return (
+    <div className={`w-full rounded-2xl overflow-hidden border transition-colors duration-300
+      ${dm ? "bg-[#1a1530] border-violet-900/40" : "bg-white border-violet-100"}`}>
 
-            return copy;
-        });
+      {/* Card header */}
+      <div className={`flex items-center gap-2.5 px-5 py-3 border-b
+        ${dm ? "bg-violet-900/20 border-violet-900/40" : "bg-violet-50 border-violet-100"}`}>
+        <div className="w-2 h-2 rounded-full bg-violet-500" />
+        <h2 className={`text-sm font-semibold ${dm ? "text-violet-200" : "text-violet-800"}`}>
+          {sectionTitle}
+        </h2>
+      </div>
 
-        dispatch(
-            updateData({
-                answer: text,
-                questionId: item.id,
-                section: currentForm,
-                subSectionKey: subSectionKey || null, // Ensure it's null if undefined
-            })
-        );
+      {/* Form body */}
+      <form onSubmit={getData} className="p-5">
+        {isNested ? (
+          <NestedForm
+            nestedData={renderingArray}
+            section={currentForm}
+            labelFormatter={(key) => getLabel(currentForm, key)}
+            inputChange={inputChange}
+          />
+        ) : (
+          <RenderingBasicForm
+            questions={Array.isArray(renderingArray) ? renderingArray : Object.values(renderingArray || {})}
+            inputChange={inputChange}
+            section={currentForm}
+            errors={errors}
+            labelFormatter={(key) => getLabel(currentForm, key)}
+          />
+        )}
 
+        {/* Action buttons */}
+        <div className={`flex items-center justify-between mt-6 pt-4 border-t
+          ${dm ? "border-violet-900/40" : "border-violet-100"}`}>
 
+          {/* Previous */}
+          {submittedFormCount > 1 ? (
+            <button
+              type="button"
+              onClick={goBack}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium border transition-colors
+                ${dm
+                  ? "bg-violet-900/30 border-violet-700/50 text-violet-300 hover:bg-violet-900/50"
+                  : "bg-violet-50 border-violet-200 text-violet-600 hover:bg-violet-100"}`}>
+              <FaArrowLeft size={11} />
+              Previous
+            </button>
+          ) : (
+            <div />
+          )}
 
-    }
-
-
-    // Previous Button Handler
-    function goBack() {
-        dispatch(updateBackRender());
-        // when th eform count 0 then prev-1 = -1 it will get issue
-        setSubmittedFormCount((prev) => Math.max(prev - 1, 0));
-    }
-
-
-    const updateSubmitButtonStatus = useCallback(() => {
-
-
-        // Check if required fields are filled
-        const filled = isRequiredFieldsFilled(renderingArray);
-        const hasErrors = Object.keys(errors).length > 0;
-        // Disable button if NOT filled
-        setIsDisabled(!filled || hasErrors)
-
-    }, [renderingArray])
-
-
-    function isFormNested() {
-        //Check if the renderingArray is null,undefinrd , empty  or  check its an array
-        if (!renderingArray || Array.isArray(renderingArray)) {
-            // set its an not a nested array -  false
-            setIsNested(false);
-            return;
-        }
-
-        // Check if the renderingArray is a object then it's a  nested Structure
-        if (typeof renderingArray === "object") {
-            // Get all values from the object  and store them in the array
-            const values = Object.values(renderingArray);
-
-            // Check if values array is not empty
-            const hasValues = values.length > 0;
-
-            //  Check if every value is an array
-            const everyValueIsArray = values.every(value => Array.isArray(value));
-
-            // Check Both must be true
-            const allValuesAreArrays = hasValues && everyValueIsArray;
-
-            // if all values are  arrays ,then its nested Structure
-            setIsNested(allValuesAreArrays);
-        } else {
-            // then its an array (NOt Nested Structure)
-            setIsNested(false);
-        }
-    }
-
-    useEffect(() => {
-        // Check if form is nested form
-        isFormNested()
-
-        // Disabled Submit/Next button based on filled forms
-        updateSubmitButtonStatus()
-    }, [renderingArray])
-
-
-    // console.log(renderingArray,isNested,'questions detail')
-
-    return (
-        <div
-            className={`${darkMode ? "bg-gray-600 text-white" : "bg-white text-gray-900"
-                } py-8 px-4 rounded-lg shadow-lg w-full transition-colors`}
-        >
-            <div className="max-w-3xl mx-auto">
-                {/* Section Title */}
-                <h2 className="text-2xl font-bold mb-6">{sectionTitle}</h2>
-                {/* Form */}
-                <form
-                    className={`${darkMode ? "bg-gray-800 shadow-lg text-white" : "bg-white shadow-md"
-                        } p-6 rounded-lg transition-colors`}
-                    onSubmit={getData}
-                >
-                    {isNested === true ? (
-                        <NestedForm
-                            nestedData={renderingArray}
-                            section={currentForm}
-                            labelFormatter={(key) => getLabel(currentForm, key)}
-                            inputChange={inputChange}
-                        />
-                    ) : (
-                        <RenderingBasicForm
-                            questions={
-                                Array.isArray(renderingArray)
-                                    ? renderingArray
-                                    : Object.values(renderingArray || {})
-                            }
-                            inputChange={inputChange}
-                            section={currentForm}
-                            errors={errors} // error
-                            labelFormatter={(key) => getLabel(currentForm, key)}
-                        //  Ensure it's null if undefined
-                        />
-                    )}
-
-                    {/* Submit Button */}
-                    <div className="flex justify-end mt-6 relative">
-                        {/* Previous Button */}
-                        {submittedFormCount > 1 && (
-                            <button
-                                type="button"
-                                onClick={goBack}
-                                className={`${darkMode
-                                    ? "bg-blue-500 hover:bg-blue-900 text-white"
-                                    : "bg-red-600 hover:bg-rose-400 text-white"
-                                    } absolute left-0 px-6 py-2.5 rounded-md font-medium cursor-pointer`}
-                            >
-                                Previous
-                            </button>
-                        )}
-                        {/* Next / Submit */}
-                        <button
-                            type="submit"
-                            disabled={isDisabled}
-                            className={`  px-6 py-2.5 rounded-md font-medium transition-colors text-white cursor-pointer
-                         ${isDisabled ? "bg-gray-400 cursor-not-allowed" : darkMode ? "bg-green-600 hover:bg-green-700" : "bg-green-500 hover:bg-green-600"}  
-                          `}>
-                            {isFinalSection ? "Submit" : "Next"}
-                        </button>
-                    </div>
-                </form>
-            </div>
+          {/* Next / Submit */}
+          <button
+            type="submit"
+            disabled={isDisabled}
+            className={`flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-medium transition-all
+              ${isDisabled
+                ? dm
+                  ? "bg-violet-900/20 text-violet-600 cursor-not-allowed"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-violet-600 hover:bg-violet-700 text-white cursor-pointer"}`}>
+            {isFinalSection ? (
+              <><FaCheck size={11} /> Submit</>
+            ) : (
+              <>Next <FaArrowRight size={11} /></>
+            )}
+          </button>
         </div>
-    );
+      </form>
+    </div>
+  );
 }
+
 export default FormContainer;

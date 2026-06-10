@@ -1,108 +1,108 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import RenderingBasicForm from "./RenderBasicForm";
 
 const NestedForm = ({ nestedData, section, labelFormatter, inputChange }) => {
-
-  // Storing sub section as tabls
+  const darkMode = useSelector((state) => state.theme);
   const tabs = Object.keys(nestedData || {});
-
   const [activeTab, setActiveTab] = useState(tabs[0] || null);
   const [skippedTabs, setSkippedTabs] = useState([]);
+  const dm = darkMode;
 
-
-  // ---------- SKIP LOGIC -------------
   const handleSkipTab = () => {
-    // Remember that the current tab was skipped   prev = previous skipped tabs   activeTab = the tab we're currently on
-
     setSkippedTabs((prev) => [...prev, activeTab]);
-
-    // Find the position of the current tab in all tabs
     const currentIndex = tabs.indexOf(activeTab);
-
-    //If there is a next tab, make it active
-    if (currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1]);
-    }
+    if (currentIndex < tabs.length - 1) setActiveTab(tabs[currentIndex + 1]);
   };
 
   function hasSkippableFields() {
-    // Step 1: Get all the questions in the current tab
     const questions = nestedData[activeTab];
-
-    // Step 2: If there are no questions, return false
-    if (!questions || !Array.isArray(questions)) {
-      return false;
-    }
-
-    // Step 3: Check if any question has "canSkip" = true
-    return questions.some(question => question.canSkip === true);
+    if (!questions || !Array.isArray(questions)) return false;
+    return questions.some((q) => q.canSkip === true);
   }
 
-
-  // console.log( 'tabs data')
-  // Reset tabs on section change
   useEffect(() => {
     setActiveTab(tabs[0] || null);
     setSkippedTabs([]);
   }, [section]);
 
-
   return (
-    <div className="space-y-6">
-      {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-4">
-        {tabs.map((key) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            type="button"
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${activeTab === key
-              ? "bg-green-500 text-white shadow-md"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-          >
-            {labelFormatter ? labelFormatter(key) : key}
-          </button>
-        ))}
+    <div className="space-y-4">
+
+      {/* Tab bar */}
+      <div className={`flex flex-wrap gap-2 pb-3 border-b
+        ${dm ? "border-violet-900/40" : "border-violet-100"}`}>
+        {tabs.map((key) => {
+          const isActive = activeTab === key;
+          const isSkipped = skippedTabs.includes(key);
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all duration-200
+                ${isActive
+                  ? "bg-violet-600 text-white border-violet-600"
+                  : isSkipped
+                    ? dm
+                      ? "bg-orange-900/20 text-orange-400 border-orange-800/40"
+                      : "bg-orange-50 text-orange-600 border-orange-200"
+                    : dm
+                      ? "bg-violet-900/20 text-violet-300 border-violet-800/40 hover:bg-violet-900/40"
+                      : "bg-violet-50 text-violet-600 border-violet-100 hover:bg-violet-100"}`}>
+              {isSkipped && (
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                  <path d="M2 6h8M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+              {labelFormatter ? labelFormatter(key) : key}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tab Panels */}
-      <div className="mt-6">
-        {tabs.map((key) => (
-          <div key={key} className={activeTab === key ? "block" : "hidden"}>
-            <div className="flex justify-between items-center mb-4">
-              {/* <h3 className="text-lg font-semibold text-gray-800">
-                {labelFormatter ? labelFormatter(key) : key}
-              </h3> */}
+      {/* Active tab content */}
+      {tabs.map((key) => (
+        <div key={key} className={activeTab === key ? "block" : "hidden"}>
 
-              {/* Skip Button */}
-              {(() => {
-                const canSkip = hasSkippableFields();
-                const isSkipped = skippedTabs.includes(key);
+          {/* Tab header row */}
+          <div className="flex items-center justify-between mb-4">
+            <p className={`text-xs font-semibold uppercase tracking-wide
+              ${dm ? "text-violet-300" : "text-violet-600"}`}>
+              {labelFormatter ? labelFormatter(key) : key}
+            </p>
 
-                return (
-                  <>
-
-                    {isSkipped && (
-                      <span className="text-xs text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
-                        Skipped
-                      </span>
-                    )}
-                  </>
-                );
-              })()}
+            <div className="flex items-center gap-2">
+              {skippedTabs.includes(key) && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-md border
+                  ${dm
+                    ? "bg-orange-900/20 text-orange-400 border-orange-800/40"
+                    : "bg-orange-50 text-orange-600 border-orange-100"}`}>
+                  Skipped
+                </span>
+              )}
+              {hasSkippableFields() && !skippedTabs.includes(key) && (
+                <button
+                  type="button"
+                  onClick={handleSkipTab}
+                  className={`text-[10px] px-2.5 py-1 rounded-lg border transition-colors
+                    ${dm
+                      ? "bg-violet-900/20 text-violet-400 border-violet-800/40 hover:bg-violet-900/40"
+                      : "bg-violet-50 text-violet-500 border-violet-100 hover:bg-violet-100"}`}>
+                  Skip this section →
+                </button>
+              )}
             </div>
-
-            {/* Actual Questions */}
-            <RenderingBasicForm
-              questions={nestedData[key] || []}
-              inputChange={inputChange}
-              section={section}
-              subsectionKey={key}
-            />
           </div>
-        ))}
-      </div>
+
+          <RenderingBasicForm
+            questions={nestedData[key] || []}
+            inputChange={inputChange}
+            section={section}
+            subsectionKey={key}
+          />
+        </div>
+      ))}
     </div>
   );
 };

@@ -3,44 +3,45 @@ import Input from "./Input";
 import MultiSelect from "./MultiSelect";
 import TextEditor from "./TextEditor";
 
-
-const RenderingBasicForm = ({ questions, inputChange, section, subsectionKey }) => {
+const RenderingBasicForm = ({ questions, inputChange, section, subsectionKey, errors = {} }) => {
   const darkMode = useSelector((state) => state.theme);
   const safeQuestions = Array.isArray(questions) ? questions : [];
+  const dm = darkMode;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-      {safeQuestions?.map((item, idx) => (
-        <div
-          key={item.id || idx}
-          className={`${item.isEditorEnabled ? "col-span-2" : ""}`}>
-          {/* Label Section */}
-          <div className="flex justify-between items-center mb-2">
-            <label className={`${darkMode ? 'text-gray-200' : 'text-gray-700'} block text-sm font-medium`}>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+      {safeQuestions.map((item, idx) => (
+        <div key={item.id || idx} className={item.isEditorEnabled ? "col-span-2" : ""}>
+
+          {/* Label row */}
+          <div className="flex items-center justify-between mb-1.5">
+            <label className={`text-xs font-semibold uppercase tracking-wide
+              ${dm ? "text-violet-300" : "text-gray-500"}`}>
               {item.displayQuestion}
-              {/* asterisk for required fields */}
               {!item.canSkip && !item.isLastForm && (
-                <span className={`${darkMode ? 'text-gray-200 ml-1' : 'text-gray-700 ml-1'}`}>*</span>
+                <span className="text-violet-500 ml-1">*</span>
               )}
             </label>
 
             {item.canSkip && (
-              <span className={`${darkMode ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-200'} text-xs px-2 py-1 rounded`}>
+              <span className={`text-[10px] px-2 py-0.5 rounded-md border
+                ${dm
+                  ? "bg-violet-900/30 text-violet-400 border-violet-700/50"
+                  : "bg-violet-50 text-violet-500 border-violet-200"}`}>
                 Optional
               </span>
             )}
           </div>
 
-          {/* Render elements condtionally */}
+          {/* Field */}
           {item.isMultiSelect ? (
             <MultiSelect
               item={item}
               section={section}
               inputChange={inputChange}
               subsectionKey={subsectionKey}
-              darkMode={darkMode}
+              darkMode={dm}
             />
-
           ) : item.isEditorEnabled ? (
             <TextEditor
               key={item.id}
@@ -48,19 +49,27 @@ const RenderingBasicForm = ({ questions, inputChange, section, subsectionKey }) 
               section={section}
               inputChange={inputChange}
               subsectionKey={subsectionKey}
-              darkMode={darkMode}
+              darkMode={dm}
             />
-
           ) : (
             <Input
               item={item}
               inputChange={inputChange}
-              darkMode={darkMode}
+              darkMode={dm}
               subsectionKey={subsectionKey}
-
             />
           )}
 
+          {/* Inline error */}
+          {errors[item.id] && (
+            <p className="flex items-center gap-1 mt-1 text-[11px] text-red-500">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <circle cx="6" cy="6" r="5.5" stroke="currentColor" strokeWidth="1"/>
+                <path d="M6 4v2.5M6 8h.01" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              </svg>
+              {errors[item.id]}
+            </p>
+          )}
         </div>
       ))}
     </div>

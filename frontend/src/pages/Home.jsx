@@ -1,187 +1,218 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaLock, FaTimes } from "react-icons/fa";
+import { FaLock, FaTimes, FaArrowRight } from "react-icons/fa";
 import { templates, TEMPLATES_ID } from "../constant";
 import { useDispatch, useSelector } from "react-redux";
 import { clearStoreData, updateStoreData } from "../features/formDataSlice";
 import templateOneInitialState from "../utils/templatesQuestions/template_1";
 import templateTwoInitialState from "../utils/templatesQuestions/template_2";
-// import { encryptData } from "../utils/Encryption"; 
 
 function Home() {
-
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const darkMode = useSelector((state) => state.theme)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  // Update questions based on selected form
   function handleProceed() {
     if (!selectedTemplate) return;
-
-    let selectedQuestions
-
-    if (selectedTemplate.id === TEMPLATES_ID.TEMPLATE_1) {
-      selectedQuestions = templateOneInitialState
-    } else if (selectedTemplate.id === TEMPLATES_ID.TEMPLATE_2) {
-      selectedQuestions = templateTwoInitialState
-    }
-
-    // Update intial state from users store
+    const selectedQuestions =
+      selectedTemplate.id === TEMPLATES_ID.TEMPLATE_1
+        ? templateOneInitialState
+        : templateTwoInitialState;
     dispatch(updateStoreData(selectedQuestions));
-    // Add data in local storage so data is retrieved on refresh
-   localStorage.setItem("userData",JSON.stringify(selectedQuestions));
-
-      // Encrypt before saving to localStorage
-    // const encryptedData = encryptData(JSON.stringify(selectedQuestions));
-    // localStorage.setItem("userData", encryptedData);
-
+    localStorage.setItem("userData", JSON.stringify(selectedQuestions));
     navigate("/userDetails");
   }
 
-
-
-  // Remove data from local storage and store
   useEffect(() => {
-    localStorage.removeItem("userData")
-    localStorage.removeItem("submittedFormCount")
-     localStorage.removeItem("isAllFormsFilled")  
-    dispatch(clearStoreData())
-  }, [])
+    localStorage.removeItem("userData");
+    localStorage.removeItem("submittedFormCount");
+    localStorage.removeItem("isAllFormsFilled");
+    dispatch(clearStoreData());
+  }, []);
 
+  const tips = [
+    "Recruiters spend just 6–7 seconds on a resume — make it count",
+    "Clean formatting beats dense paragraphs every time",
+    "ATS-friendly templates improve shortlisting chances",
+  ];
 
   return (
-    <div className={`h-screen w-full absolute top-0 -z-10 flex flex-col transition-all duration-300 overflow-hidden
-      ${darkMode ? "bg-linear-to-br from-gray-900 via-gray-800 to-gray-900"
-        : "bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50"}`}>
+    <div className={`min-h-screen w-full absolute top-0 -z-10 pt-16 transition-colors duration-300
+      ${darkMode ? "bg-[#0f0c1a]" : "bg-violet-50/60"}`}>
 
-      {/* Small Animated Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-6 left-3 w-16 h-16 rounded-full blur-lg opacity-15 animate-pulse 
-          ${darkMode ? "bg-purple-600" : "bg-indigo-400"}`}></div>
-        <div className={`absolute bottom-6 right-3 w-24 h-24 rounded-full blur-lg opacity-15 animate-pulse 
-          ${darkMode ? "bg-indigo-600" : "bg-purple-400"}`} style={{ animationDelay: '1s' }}></div>
+      {/* Soft background accent */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className={`absolute top-0 right-0 w-80 h-80 rounded-full blur-3xl opacity-[0.07]
+          ${darkMode ? "bg-violet-500" : "bg-violet-400"}`} />
+        <div className={`absolute bottom-10 left-10 w-48 h-48 rounded-full blur-3xl opacity-[0.06]
+          ${darkMode ? "bg-fuchsia-500" : "bg-fuchsia-400"}`} />
       </div>
 
-      {/* Hero Section */}
-      <section className="relative flex-1 flex items-center justify-center px-3 md:px-4 py-3">
-        <div className="max-w-5xl w-full grid md:grid-cols-2 gap-4 lg:gap-6 items-start">
+      <section className="relative max-w-4xl mx-auto px-4 py-10 grid md:grid-cols-2 gap-10 items-start">
 
-          {/* Left Content */}
-          <div className="space-y-2 flex flex-col justify-center z-10 md:order-1 mt-8">
-            <h1 className={`text-xl md:text-4xl lg:text-3xl font-bold leading-tight 
-              ${darkMode ? "text-white" : "text-gray-900"}`}>
-              Select Your <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Perfect Template</span>
-            </h1>
-            <p className={`text-xs md:text-sm ${darkMode ? "text-gray-300" : "text-gray-600"}`}>
-              Choose the perfect template for your career stage and land your dream job effortlessly.
-            </p>
+        {/* Left */}
+        <div>
+          {/* Badge */}
+          <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full border mb-4
+            ${darkMode
+              ? "bg-violet-900/40 text-violet-300 border-violet-700/50"
+              : "bg-violet-50 text-violet-700 border-violet-200"}`}>
+            🎓 Student resume builder
+          </span>
 
-            {/* Templates Grid */}
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              {templates.map((t) => (
-                <div key={t.id} onClick={() => setSelectedTemplate(t)}
-                  className={`group relative rounded-md overflow-hidden shadow-sm transition-all duration-200 transform
-                    ${darkMode ? "bg-gray-800 hover:bg-gray-750 border-gray-700" : "bg-white hover:bg-gray-50 border-gray-200"} 
-                    ${t.locked ? "opacity-60 cursor-not-allowed hover:translate-y-0" : "cursor-pointer hover:-translate-y-0.5"}`}>
+          <h1 className={`text-2xl md:text-3xl font-semibold leading-snug mb-3
+            ${darkMode ? "text-white" : "text-gray-900"}`}>
+            Pick your template,<br />
+            <span className="text-violet-600">land your dream job</span>
+          </h1>
 
-                  <div className="p-1.5 space-y-1">
-                    <div className="relative w-full aspect-[3/4] rounded overflow-hidden bg-linear-to-br from-gray-100 to-gray-200">
-                      <img src={t.src} alt={`Template ${t.id}`} className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" />
+          <p className={`text-sm mb-6 leading-relaxed
+            ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+            Designed for freshers & interns. Fill in your details — we handle the formatting.
+          </p>
 
-                      {t.locked && (
-                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center">
-                          <FaLock size={14} className="text-white"/>
-                        </div>
-                      )}
+          {/* Template grid */}
+          <div className="grid grid-cols-2 gap-3">
+            {templates.map((t) => (
+              <div
+                key={t.id}
+                onClick={() => !t.locked && setSelectedTemplate(t)}
+                className={`group relative rounded-xl overflow-hidden border transition-all duration-200
+                  ${darkMode
+                    ? "bg-[#1a1530] border-violet-900/50"
+                    : "bg-white border-violet-100"}
+                  ${t.locked
+                    ? "opacity-50 cursor-not-allowed"
+                    : `cursor-pointer hover:-translate-y-1 ${darkMode ? "hover:border-violet-500" : "hover:border-violet-400"}`}`}>
 
-
+                {/* Image area */}
+                <div className={`aspect-[3/4] overflow-hidden relative
+                  ${darkMode ? "bg-violet-900/20" : "bg-violet-50"}`}>
+                  <img
+                    src={t.src}
+                    alt={`Template ${t.id}`}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  {t.locked && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                      <FaLock size={13} className="text-white/80" />
                     </div>
-
-                    <div className="text-center">
-                      <h3 className={`text-xs font-bold ${darkMode ? "text-white" : "text-gray-900"}`}>
-                        Template {t.id}
-                      </h3>
-                      {!t.locked && <p className={`text-xs ${darkMode ? "text-gray-400" : "text-gray-500"}`}>Click to customize</p>}
-                    </div>
-                  </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Right Preview */}
-         <div className="relative hidden md:flex items-center justify-center h-full min-h-[200px] md:order-2 mt-8 md:ml-28">
-            <div className={`absolute inset-0 rounded-lg backdrop-blur-lg shadow-sm border 
-              ${darkMode ? "bg-linear-to-br from-gray-800/20 via-purple-900/20 to-indigo-900/20 border-gray-700/40"
-                : "bg-linear-to-br from-white/20 via-purple-100/20 to-indigo-100/20 border-white/40"}`}></div>
-
-            <div className="relative z-10 w-full max-w-xs">
-              <div className={`rounded-lg overflow-hidden shadow-sm transform rotate-0 hover:rotate-0 transition-transform duration-300
-                ${darkMode ? "border-gray-700" : "border-white"}`}>
-                <img src="https://njvawavweamzvvakmsgn.supabase.co/storage/v1/object/public/accioresume/hello.jpg" alt="Resume Preview" className="w-full h-auto object-cover"
-                  onError={(e) => { e.target.src = templates[0].src; }} />
+                {/* Footer */}
+                <div className={`px-2 py-2 text-center border-t
+                  ${darkMode ? "border-violet-900/40" : "border-violet-50"}`}>
+                  <p className={`text-xs font-medium ${darkMode ? "text-white" : "text-gray-800"}`}>
+                    Template {t.id}
+                  </p>
+                  <p className="text-[10px] text-violet-400">
+                    {t.locked ? "Coming soon" : "Tap to preview"}
+                  </p>
+                </div>
               </div>
-
-              <div className="absolute -top-2 -left-2 w-6 h-6 bg-linear-to-br from-indigo-500 to-purple-600 rounded-full blur-md opacity-30 animate-pulse"></div>
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-linear-to-br from-pink-500 to-orange-500 rounded-full blur-md opacity-30 animate-pulse" style={{ animationDelay: '1.5s' }}></div>
-            </div>
-
+            ))}
           </div>
-          
+        </div>
+
+        {/* Right panel */}
+        <div className={`hidden md:flex flex-col gap-4 rounded-2xl border p-5
+          ${darkMode
+            ? "bg-[#1a1530] border-violet-900/40"
+            : "bg-white border-violet-100"}`}>
+
+          <p className="text-[10px] font-medium uppercase tracking-widest text-violet-400">
+            Why it matters
+          </p>
+
+          {/* Illustration placeholder */}
+          <div className={`rounded-xl aspect-video flex items-center justify-center
+            ${darkMode ? "bg-violet-900/20" : "bg-violet-50"}`}>
+            <img
+              src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=500&q=80&auto=format&fit=crop"
+              alt="Student working on resume"
+              className="w-full h-full object-cover rounded-xl"
+              onError={(e) => { e.target.style.display = "none"; }}
+            />
+          </div>
+
+          <ul className="space-y-3 mt-1">
+            {tips.map((tip, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-violet-500 flex-shrink-0" />
+                <span className={`text-xs leading-relaxed ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
+                  {tip}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA nudge */}
+          <div className={`mt-2 rounded-xl p-3 border
+            ${darkMode
+              ? "bg-violet-900/20 border-violet-800/40"
+              : "bg-violet-50 border-violet-100"}`}>
+            <p className={`text-xs font-medium mb-0.5 ${darkMode ? "text-violet-300" : "text-violet-700"}`}>
+              Ready in under 5 minutes
+            </p>
+            <p className={`text-[11px] ${darkMode ? "text-violet-400" : "text-violet-500"}`}>
+              Pick a template on the left to get started →
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Modal */}
-{selectedTemplate && (
-  <div
-    className="fixed inset-0 z-50 flex items-start justify-center  bg-black/60 backdrop-blur-sm animate-fadeIn"
-  >
-    <div
-      className={`relative w-85 max-w-sm rounded-xl shadow-xl overflow-hidden transform transition-all animate-scaleIn
-      ${darkMode ? "bg-gray-800" : "bg-white"} mt-18`} 
-      onClick={(e) => e.stopPropagation()} // prevent clicks inside modal from bubbling
-    >
-      {/* Close Button */}
-      <button
-        onClick={() => setSelectedTemplate(null)} // Only X closes modal
-        className={`absolute top-2 right-2 z-10 p-1.5 rounded-full transition-all duration-200
-        ${darkMode ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-100 hover:bg-gray-200 text-gray-800"}`}
-      >
-        <FaTimes size={14} />
-      </button>
+      {selectedTemplate && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setSelectedTemplate(null)}>
+          <div
+            className={`relative w-72 rounded-2xl border overflow-hidden
+              ${darkMode
+                ? "bg-[#1a1530] border-violet-800/60"
+                : "bg-white border-violet-100"}`}
+            onClick={(e) => e.stopPropagation()}>
 
-      {/* Modal Content */}
-      <div className="p-4 flex flex-col items-center space-y-3">
-        {/* Template Preview */}
-        <div className="w-full max-w-xs">
-          <div className={`rounded-md overflow-hidden shadow-lg border
-            ${darkMode ? "border-indigo-500" : "border-indigo-400"}`}>
-            <img
-              src={selectedTemplate.src}
-              alt={`Template ${selectedTemplate.id}`}
-              className="object-cover rounded-md w-full h-auto"
-            />
+            {/* Close */}
+            <button
+              onClick={() => setSelectedTemplate(null)}
+              className={`absolute top-3 right-3 w-7 h-7 rounded-lg border flex items-center justify-center z-10 transition-colors
+                ${darkMode
+                  ? "bg-violet-900/40 border-violet-700/50 text-violet-300 hover:bg-violet-900/70"
+                  : "bg-violet-50 border-violet-100 text-violet-500 hover:bg-violet-100"}`}>
+              <FaTimes size={10} />
+            </button>
+
+            {/* Preview image */}
+            <div className="overflow-hidden">
+              <img
+                src={selectedTemplate.src}
+                alt={`Template ${selectedTemplate.id}`}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+
+            {/* Info + action */}
+            <div className="p-4">
+              <p className={`text-sm font-medium mb-0.5 ${darkMode ? "text-white" : "text-gray-900"}`}>
+                Template {selectedTemplate.id}
+              </p>
+              <p className="text-xs text-violet-400 mb-4">Clean & professional · Ready to fill</p>
+
+              <button
+                onClick={handleProceed}
+                className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors">
+                <FaArrowRight size={11} />
+                Continue to form
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Action Button */}
-        <button
-          onClick={handleProceed}
-          className="w-full max-w-xs py-2 px-4 rounded-md font-semibold text-sm text-white bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 shadow-md"
-        >
-          Continue to Form
-        </button>
-      </div>
+      )}
     </div>
-  </div>
-)}
-
-
-
-
-    </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

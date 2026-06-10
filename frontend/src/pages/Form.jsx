@@ -6,91 +6,93 @@ import { updateStoreData } from "../features/formDataSlice";
 import { Bounce, ToastContainer } from "react-toastify";
 import CircularLoader from "../components/CircularLoader";
 
-
 function Form() {
-    const [submittedFormCount, setSubmittedFormCount] = useState(1);
-    const dispatch = useDispatch();
-    const darkMode = useSelector((state) => state.theme); // Get dark mode from Redux
-    const LazyFormImageComponent = lazy(() => import("../components/FormImage"));
+  const [submittedFormCount, setSubmittedFormCount] = useState(1);
+  const dispatch = useDispatch();
+  const darkMode = useSelector((state) => state.theme);
+  const LazyFormImageComponent = lazy(() => import("../components/FormImage"));
 
+  useEffect(() => {
+    const stored = localStorage.getItem("userData");
+    if (stored) {
+      try { dispatch(updateStoreData(JSON.parse(stored))); }
+      catch { localStorage.removeItem("userData"); }
+    }
+    const count = Number(localStorage.getItem("submittedFormCount"));
+    if (count) setSubmittedFormCount(count);
+  }, []);
 
+  return (
+    <div className={`min-h-screen w-full flex flex-col items-center pt-20 pb-10 px-4 transition-colors duration-300
+      ${darkMode ? "bg-[#0f0c1a]" : "bg-violet-50/60"}`}>
 
-    // If page refreshes take stored data from local storage and update the store
-    useEffect(() => {
+      {/* Progress bar */}
+      <div className="w-full max-w-2xl mb-8">
+        <ProgressBar submittedFormCount={submittedFormCount} darkMode={darkMode} />
+      </div>
 
-        const locallyStoredUserData = localStorage.getItem("userData");
+      {/* Main layout */}
+      <div className="w-full max-w-4xl flex flex-col md:flex-row items-start gap-6">
 
-        if (locallyStoredUserData) {
-            try {
-            const localStorageData = JSON.parse(locallyStoredUserData);
-            dispatch(updateStoreData(localStorageData));
-            } catch (error) {
-            //   console.error("Corrupted localStorage userData:", error);
-              localStorage.removeItem("userData");
-            }
-        }
+        {/* Illustration */}
+        <Suspense fallback={<CircularLoader />}>
+          <div className={`hidden md:flex flex-col items-center justify-center rounded-2xl border p-6 w-56 flex-shrink-0
+            ${darkMode
+              ? "bg-[#1a1530] border-violet-900/40"
+              : "bg-white border-violet-100"}`}>
+            <LazyFormImageComponent />
+            <p className={`mt-4 text-xs text-center leading-relaxed
+              ${darkMode ? "text-violet-400" : "text-violet-500"}`}>
+              Fill each section carefully — your resume reflects your best self ✨
+            </p>
+          </div>
+        </Suspense>
 
-        const submittedFormCountStoredInLocal = Number(localStorage.getItem("submittedFormCount"));
+        {/* Form card */}
+        <div className={`flex-1 w-full rounded-2xl border overflow-hidden
+          ${darkMode
+            ? "bg-[#1a1530] border-violet-900/40"
+            : "bg-white border-violet-100"}`}>
 
-        if (submittedFormCountStoredInLocal) {
-            setSubmittedFormCount(submittedFormCountStoredInLocal);
-        }
+          {/* Card header strip */}
+          <div className={`px-5 py-3 border-b flex items-center gap-2
+            ${darkMode
+              ? "bg-violet-900/20 border-violet-900/40"
+              : "bg-violet-50 border-violet-100"}`}>
+            <div className="w-2 h-2 rounded-full bg-violet-500" />
+            <p className={`text-xs font-medium ${darkMode ? "text-violet-300" : "text-violet-700"}`}>
+              Fill in your details
+            </p>
+          </div>
 
-    }, []);
-
-
-    return (
-
-        <div
-            className={`${darkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
-                } w-full h-screen flex flex-col items-center pt-6 p-4 transition-colors`}
-        >
-            {/* Progress Bar on TOP */}
-            <div className="w-full max-w-xl mb-4">
-                <ProgressBar
-                    submittedFormCount={submittedFormCount}
-                    darkMode={darkMode}
-                />
-            </div>
-
-            {/* Render Forms */}
-            <div className="w-full max-w-4xl flex flex-col md:flex-row items-start md:items-center justify-center gap-8 mt-8">
-                {/* Left Image */}
-                <Suspense fallback={<CircularLoader />}>
-                    <div className="w-60 h-60 md:w-84 md:h-84 flex-shrink-0">
-                        <LazyFormImageComponent />
-                    </div>
-                </Suspense>
-
-                {/* Right Form */}
-                <div className="flex-1 flex justify-center">
-                    <div className="w-full max-w-2xl h-[70vh] overflow-y-auto px-2">
-                        <FormContainer
-                            setSubmittedFormCount={setSubmittedFormCount}
-                            submittedFormCount={submittedFormCount}
-                        />
-                    </div>
-                </div>
-            </div>
-
-
-
-            <ToastContainer
-                position="top-right"
-                autoClose={4000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-                transition={Bounce}
+          {/* Scrollable form content */}
+          <div className={`h-[65vh] overflow-y-auto px-5 py-4
+            [scrollbar-width:thin]
+            [scrollbar-color:theme(colors.violet.300)_transparent]
+            ${darkMode ? "[scrollbar-color:theme(colors.violet.800)_transparent]" : ""}`}>
+            <FormContainer
+              setSubmittedFormCount={setSubmittedFormCount}
+              submittedFormCount={submittedFormCount}
             />
+          </div>
         </div>
+      </div>
 
-    );
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={darkMode ? "dark" : "colored"}
+        transition={Bounce}
+      />
+    </div>
+  );
 }
 
 export default Form;
